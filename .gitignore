@@ -1,0 +1,24 @@
+# Local tooling and editor state
+.tools/
+.vscode/
+
+# The application has its own Git repository; do not add it as an accidental gitlink.
+/hotel-booking/
+
+# Local commands can contain credentials.
+/command.txt
+
+# Secrets, runtime data and generated artifacts
+.env
+.env.*
+!.env.example
+*.log
+*.sql
+*.dump
+*.backup
+backups/
+output/
+node_modules/
+coverage/
+*.key
+*.pem
