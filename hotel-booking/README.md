@@ -88,21 +88,13 @@ Tài khoản ban đầu lấy từ `STAFF_ADMIN_USERNAME`/`STAFF_ADMIN_PASSWORD`
 |---|---|
 | Website (Ubuntu server) | https://IP_UBUNTU:8443 |
 | Đăng nhập | https://IP_UBUNTU:8443/login |
-| pgAdmin | http://localhost:5050 |
+| pgAdmin | http://IP_UBUNTU:5050 |
 | Grafana (Ubuntu server) | http://IP_UBUNTU:3000 |
-| Prometheus | http://localhost:9090 |
-| Alertmanager | http://localhost:9093 |
-| Hòm cảnh báo cục bộ | http://localhost:9094 |
+| Prometheus | http://IP_UBUNTU:9090 |
+| Alertmanager | http://IP_UBUNTU:9093 |
+| Hòm cảnh báo | http://IP_UBUNTU:9094 |
 
-HTTPS website và Grafana được công bố lần lượt tại cổng 8443 và 3000 để máy trong mạng demo truy cập trực tiếp. HTTP cổng 8000 tự chuyển sang HTTPS. Giới hạn truy cập các cổng này trong mạng lab bằng firewall; chứng chỉ tự ký phù hợp cho demo nhưng trình duyệt sẽ cảnh báo và không dùng cho website công khai. pgAdmin, Prometheus và Alertmanager vẫn chỉ bind localhost trên server; truy cập từ Windows bằng SSH tunnel. `/live` kiểm tra tiến trình; `/ready` và `/health` truy vấn DB thực, trả 503 khi không phục vụ được. `/metrics` chỉ cho giám sát nội bộ có token.
-
-Trên Windows, mở PowerShell và giữ cửa sổ SSH tunnel này chạy:
-
-```powershell
-ssh -N -L 5050:127.0.0.1:5050 -L 9090:127.0.0.1:9090 mrtruong@IP_UBUNTU
-```
-
-Sau đó mở pgAdmin tại `http://localhost:5050` và Prometheus tại `http://localhost:9090`. Mở Grafana trực tiếp tại `http://IP_UBUNTU:3000`. Thay `IP_UBUNTU` bằng địa chỉ máy Ubuntu.
+Website HTTPS và các công cụ pgAdmin, Grafana, Prometheus, Alertmanager cùng hòm cảnh báo được công bố để máy trong mạng demo truy cập trực tiếp bằng IP Ubuntu. HTTP cổng 8000 tự chuyển sang HTTPS cổng 8443. Giới hạn truy cập các cổng này trong mạng lab bằng firewall; chứng chỉ tự ký phù hợp cho demo nhưng trình duyệt sẽ cảnh báo và không dùng cho website công khai. `/live` kiểm tra tiến trình; `/ready` và `/health` truy vấn DB thực, trả 503 khi không phục vụ được. `/metrics` chỉ cho giám sát nội bộ có token.
 
 ## Chạy, dừng và cập nhật
 
