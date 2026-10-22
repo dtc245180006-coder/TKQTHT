@@ -26,7 +26,7 @@ Chạy các lệnh sau trong terminal Ubuntu:
 ```bash
 git clone -b dev https://github.com/dtc245180006-coder/TKQTHT.git
 cd TKQTHT/hotel-booking
-bash deploy/ubuntu-demo.sh
+bash deploy/install-ubuntu.sh
 ```
 
 Ở lần chạy đầu, script tự tạo `.env` với mật khẩu ngẫu nhiên, cài dependency trong container, tạo bí mật, sao lưu cơ sở dữ liệu, chạy migration, build backend và bật website cùng các dịch vụ giám sát gồm cAdvisor và Promtail. Tài khoản được ghi vào `secrets/local/INITIAL-CREDENTIALS.txt` với quyền chỉ chủ máy đọc. Giữ thư mục `secrets` và `.env` riêng tư; chúng không được đưa lên Git.
@@ -90,7 +90,7 @@ sudo docker compose ps
 sudo docker compose --profile host-observability --profile linux-host-logs stop
 ```
 
-Sau khi sửa mã, chạy lại `bash deploy/ubuntu-demo.sh` để build/cập nhật theo đúng thứ tự migration và quyền. Không dùng `docker compose down -v` khi có dữ liệu cần giữ.
+Sau khi sửa mã, chạy lại `bash deploy/install-ubuntu.sh` để build/cập nhật theo đúng thứ tự migration và quyền. Không dùng `docker compose down -v` khi có dữ liệu cần giữ.
 
 Chạy giao diện riêng khi phát triển:
 

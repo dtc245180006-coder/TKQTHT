@@ -32,14 +32,14 @@ if [[ ! -f .env ]]; then
   mkdir -p secrets/local
   chmod 700 secrets secrets/local
   cat > secrets/local/INITIAL-CREDENTIALS.txt <<EOF
-Demo login credentials (generated on first install)
+Initial login credentials (generated on first install)
 Website: http://$(hostname -I | awk '{print $1}'):8000
 Staff administrator: admin / $(sed -n 's/^STAFF_ADMIN_PASSWORD=//p' .env)
 Reception: letan / $(sed -n 's/^STAFF_RECEPTION_PASSWORD=//p' .env)
 Grafana: admin / $(sed -n 's/^GRAFANA_PASSWORD=//p' .env)
 pgAdmin: admin@example.com / $(sed -n 's/^PGADMIN_PASSWORD=//p' .env)
 
-Keep this file private. Change the passwords after the demo if this VM will be reused.
+Keep this file private. Change the passwords before reusing this server.
 EOF
   chmod 600 secrets/local/INITIAL-CREDENTIALS.txt
   echo "Created .env and generated demo credentials."
@@ -84,4 +84,4 @@ echo
 echo "Website:  http://$(hostname -I | awk '{print $1}'):8000"
 echo "Grafana:  http://$(hostname -I | awk '{print $1}'):3000"
 echo "Login details (first install only): secrets/local/INITIAL-CREDENTIALS.txt"
-echo "For a fresh reinstall, keep this VM's secrets and data safe; do not run 'docker compose down -v' unless you intend to erase them."
+echo "Keep the secrets and data safe; do not run 'docker compose down -v' unless you intend to erase them."
