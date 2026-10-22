@@ -1,0 +1,78 @@
+<div class="modal" id="bookingModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">Đặt Phòng Khách Sạn</h3>
+          <button class="btn-close" id="btnCloseModal" aria-label="Đóng">&times;</button>
+        </div>
+        <form id="bookingForm">
+          <div class="modal-body">
+            <!-- Room Info Preview -->
+            <div class="selected-room-banner" id="selectedRoomBanner">
+              <img id="modalRoomImg" src="" alt="Room">
+              <div class="selected-room-info">
+                <h4 id="modalRoomName">Tên phòng</h4>
+                <p id="modalRoomType">Hạng phòng</p>
+                <div class="price-tag" id="modalRoomPrice">0 đ / đêm</div>
+              </div>
+            </div>
+
+            <input type="hidden" id="modalRoomId">
+            <div class="form-group">
+              <label for="modalGuests">Số khách lưu trú *</label>
+              <input type="number" id="modalGuests" required min="1" max="50" step="1" value="1">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="custName">Họ và tên khách hàng *</label>
+                <input type="text" id="custName" required minlength="2" maxlength="120" autocomplete="name" placeholder="Ví dụ: Nguyễn Văn An">
+              </div>
+              <div class="form-group">
+                <label for="custPhone">Số điện thoại *</label>
+                <input type="tel" id="custPhone" required minlength="8" maxlength="20" autocomplete="tel" placeholder="Ví dụ: 0912345678">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="custEmail">Email liên hệ *</label>
+              <input type="email" id="custEmail" required maxlength="120" autocomplete="email" placeholder="Ví dụ: an.nguyen@gmail.com">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="modalCheckIn">Ngày nhận phòng *</label>
+                <input type="date" id="modalCheckIn" required>
+              </div>
+              <div class="form-group">
+                <label for="modalCheckOut">Ngày trả phòng *</label>
+                <input type="date" id="modalCheckOut" required>
+              </div>
+            </div>
+
+            <% if (!currentUser) { %>
+            <p class="muted">Yêu cầu cần lễ tân liên hệ kiểm tra và duyệt trước hạn giữ phòng. Hạn cụ thể sẽ hiển thị sau khi gửi; hệ thống chưa tự xác minh email và chưa gửi email xác nhận.</p>
+            <% } %>
+            <!-- Price Summary Box -->
+            <div class="price-summary-box">
+              <div class="summary-line">
+                <span>Số đêm lưu trú:</span>
+                <span id="summaryNights">1 đêm</span>
+              </div>
+              <div class="summary-line font-bold">
+                <span>Tổng tiền thanh toán:</span>
+                <span class="total-highlight" id="summaryTotalPrice">0 đ</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="btnCancelModal">Hủy bỏ</button>
+            <button type="submit" class="btn btn-gold" id="btnSubmitBooking">
+              <%= currentUser ? 'Xác nhận đặt phòng' : 'Gửi yêu cầu đặt phòng' %>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

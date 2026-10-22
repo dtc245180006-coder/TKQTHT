@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Hotel Booking
+    orgId: 1
+    folder: Hotel Booking
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards

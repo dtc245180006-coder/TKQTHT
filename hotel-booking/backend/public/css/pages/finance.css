@@ -1,0 +1,38 @@
+.stay-balance {
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--gold-light);
+  border-radius: 8px;
+}
+.table-card {
+  margin: 16px 0 28px;
+}
+.form-group {
+  min-width: 0;
+}
+.receipt-card {
+  max-width: 800px;
+  overflow-wrap: anywhere;
+}
+.stay-events {
+  padding-left: 20px;
+}
+.stay-events li {
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+@media print {
+  .navbar,
+  footer,
+  button,
+  .btn,
+  #toastContainer {
+    display: none !important;
+  }
+  .section {
+    padding: 0;
+  }
+  .receipt-card {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Backend Up",
+      "id": 1,
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "up{job=\"hotel-backend\"}", "refId": "A" }]
+    },
+    {
+      "type": "stat",
+      "title": "PostgreSQL Up",
+      "id": 2,
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "up{job=\"postgres\"}", "refId": "A" }]
+    },
+    {
+      "type": "stat",
+      "title": "Bookings Created",
+      "id": 3,
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum(hotel_bookings_created_total)", "refId": "A" }]
+    },
+    {
+      "type": "stat",
+      "title": "HTTP 5xx (5m)",
+      "id": 4,
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum(increase(hotel_http_requests_total{status_code=~\"5..\"}[5m]))", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Requests / second",
+      "id": 5,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum by (method, status_code) (rate(hotel_http_requests_total[5m]))", "legendFormat": "{{method}} {{status_code}}", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP p95 duration",
+      "id": 6,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "histogram_quantile(0.95, sum by (le) (rate(hotel_http_request_duration_seconds_bucket[5m])))", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Container memory",
+      "id": 7,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "container_memory_working_set_bytes{name=~\"hotel-booking.*\"}", "legendFormat": "{{name}}", "refId": "A" }]
+    },
+    {
+      "type": "logs",
+      "title": "Application logs",
+      "id": 8,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "expr": "{compose_project=\"hotel-booking\"}", "refId": "A" }]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 41,
+  "tags": ["hotel-booking", "tkqtht"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "title": "Hotel Booking Overview",
+  "uid": "hotel-overview",
+  "version": 1
+}

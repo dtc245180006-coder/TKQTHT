@@ -1,0 +1,57 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main-content">
+<section id="bookings-section" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="section-tag">QUẢN TRỊ DỮ LIỆU</span>
+          <h2 class="section-title">Quản lý đơn đặt phòng</h2>
+        </div>
+        <button id="btnRefreshBookings" class="btn btn-outline">
+          🔄 Làm mới dữ liệu
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <input id="bookingSearch" type="search" placeholder="Tìm mã đơn, tên, email hoặc số điện thoại" aria-label="Tìm đơn đặt phòng">
+        <select id="bookingStatus" aria-label="Lọc trạng thái đơn">
+          <option value="">Tất cả trạng thái</option>
+          <option value="pending">Chờ lễ tân duyệt</option>
+          <option value="expired">Đã hết hạn</option>
+          <option value="confirmed">Đã xác nhận</option>
+          <option value="checked_in">Đang lưu trú</option>
+          <option value="checked_out">Đã trả phòng</option>
+          <option value="cancelled">Đã hủy</option>
+          <option value="no_show">Khách không đến</option>
+        </select>
+        <span id="bookingSummary" class="muted"></span>
+      </div>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Liên hệ</th>
+                <th>Phòng đặt</th>
+                <th>Thời gian</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody">
+              <tr>
+                <td colspan="8" class="text-center py-4">Đang tải danh sách đơn đặt phòng...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('../components/stay-dialog') %>
+<%- include('../partials/footer') %>

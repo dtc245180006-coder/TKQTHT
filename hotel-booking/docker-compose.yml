@@ -1,0 +1,377 @@
+name: hotel-booking
+
+x-bounded-logs: &bounded_logs
+  driver: local
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    logging: *bounded_logs
+    mem_limit: 768m
+    cpus: "1.5"
+    pids_limit: 256
+    command: [postgres, -c, log_statement=none, -c, log_min_error_statement=panic, -c, log_error_verbosity=terse, -c, log_parameter_max_length_on_error=0]
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Copy .env.example to .env and configure it}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - data
+      - monitoring
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  backend: &backend
+    logging: *bounded_logs
+    mem_limit: 384m
+    cpus: "1"
+    pids_limit: 256
+    image: ${BACKEND_IMAGE:-hotel-booking-backend:latest}
+    build:
+      context: ./backend
+    environment: &backend_environment
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: hotel_app
+      DB_PASSWORD_FILE: /run/secrets/app_password
+      DB_AUTO_MIGRATE: "false"
+      STAFF_BOOTSTRAP: "false"
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-false}
+      TRUST_PROXY: "1"
+      REQUIRE_HTTPS: "false"
+      METRICS_TOKEN_FILE: /run/secrets/metrics_token
+      SESSION_SECRET_FILE: /run/secrets/session_secret
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      BOOKING_HOLD_MINUTES: ${BOOKING_HOLD_MINUTES:-120}
+      OPERATIONS_LOG_DIR: /var/log/hotel
+    volumes:
+      - backend_logs:/var/log/hotel
+    secrets: [app_password, session_secret, metrics_token]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edge
+      - data
+      - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/ready"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  migrate:
+    logging: *bounded_logs
+    mem_limit: 384m
+    cpus: "1"
+    pids_limit: 256
+    <<: *backend
+    profiles: [maintenance]
+    command: [node, scripts/migrate.cjs]
+    environment:
+      <<: *backend_environment
+      DB_USER: hotel_migrator
+      DB_PASSWORD_FILE: /run/secrets/migration_password
+      DB_AUTO_MIGRATE: "true"
+      STAFF_BOOTSTRAP: "true"
+      STAFF_ADMIN_USERNAME: ${STAFF_ADMIN_USERNAME}
+      STAFF_ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+      STAFF_RECEPTION_USERNAME: ${STAFF_RECEPTION_USERNAME}
+      STAFF_RECEPTION_PASSWORD_FILE: /run/secrets/reception_password
+    secrets: [migration_password, session_secret, metrics_token, admin_password, reception_password]
+    networks: [data]
+    restart: "no"
+    healthcheck:
+      disable: true
+
+  nginx:
+    logging: *bounded_logs
+    mem_limit: 96m
+    cpus: "0.5"
+    pids_limit: 256
+    image: nginxinc/nginx-unprivileged:1.28-alpine
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:80:8080"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - edge
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  pgadmin:
+    logging: *bounded_logs
+    mem_limit: 384m
+    cpus: "0.75"
+    pids_limit: 256
+    cap_drop: [ALL]
+    secrets: [pgadmin_password]
+    image: dpage/pgadmin4:9
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
+      PGADMIN_LISTEN_PORT: 8080
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+    ports:
+      - "127.0.0.1:5050:8080"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - data
+      - admin
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  postgres-exporter:
+    logging: *bounded_logs
+    mem_limit: 128m
+    cpus: "0.25"
+    pids_limit: 256
+    cap_drop: [ALL]
+    secrets: [monitor_password]
+    image: prometheuscommunity/postgres-exporter:v0.20.1
+    environment:
+      DATA_SOURCE_URI: postgres:5432/${POSTGRES_DB}?sslmode=disable
+      DATA_SOURCE_USER: hotel_monitor
+      DATA_SOURCE_PASS_FILE: /run/secrets/monitor_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - monitoring
+      - data
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+
+  cadvisor:
+    logging: *bounded_logs
+    mem_limit: 256m
+    cpus: "0.5"
+    pids_limit: 256
+    profiles: [host-observability]
+    image: ghcr.io/google/cadvisor:0.55.1
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  prometheus:
+    logging: *bounded_logs
+    mem_limit: 512m
+    cpus: "1"
+    pids_limit: 256
+    cap_drop: [ALL]
+    secrets: [metrics_token]
+    image: prom/prometheus:v3
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --storage.tsdb.retention.size=1GB
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on:
+      - backend
+      - postgres-exporter
+    networks:
+      - monitoring
+      - admin
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  loki:
+    logging: *bounded_logs
+    mem_limit: 640m
+    cpus: "1"
+    pids_limit: 256
+    cap_drop: [ALL]
+    image: grafana/loki:3.7.0
+    command: -config.file=/etc/loki/local-config.yml
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yml:ro
+      - loki_data:/loki
+    networks:
+      - monitoring
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  alloy:
+    user: "473:1000"
+    logging: *bounded_logs
+    mem_limit: 256m
+    cpus: "0.5"
+    pids_limit: 256
+    image: grafana/alloy:v1.20.0
+    command: [run, --server.http.listen-addr=0.0.0.0:12345, --storage.path=/var/lib/alloy, /etc/alloy/config.alloy]
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - backend_logs:/logs:ro
+      - alloy_data:/var/lib/alloy
+    networks: [monitoring]
+    depends_on: [loki]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+
+  alertmanager:
+    logging: *bounded_logs
+    mem_limit: 128m
+    cpus: "0.25"
+    pids_limit: 256
+    image: prom/alertmanager:v0.34.1
+    command: [--config.file=/etc/alertmanager/alertmanager.yml, --storage.path=/alertmanager, --data.retention=168h, --cluster.listen-address=]
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    ports: ["127.0.0.1:9093:9093"]
+    networks: [monitoring, admin]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+
+  operations:
+    logging: *bounded_logs
+    mem_limit: 128m
+    cpus: "0.5"
+    pids_limit: 256
+    image: ${BACKEND_IMAGE:-hotel-booking-backend:latest}
+    command: [node, ops/server.cjs]
+    volumes:
+      - operations_data:/var/lib/hotel-ops
+      - ./output/operations:/observations:ro
+    ports: ["127.0.0.1:9094:9094"]
+    networks: [monitoring, edge, admin]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, wget, --spider, -q, http://127.0.0.1:9094/health]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+
+  grafana:
+    logging: *bounded_logs
+    mem_limit: 512m
+    cpus: "1"
+    pids_limit: 256
+    cap_drop: [ALL]
+    secrets: [grafana_password]
+    image: grafana/grafana:12.4.11
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - monitoring
+      - admin
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  edge:
+  admin:
+  data:
+    internal: true
+  monitoring:
+    internal: true
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+  promtail_positions:
+    # Retained legacy data only; no Promtail service is started.
+  backend_logs:
+  alloy_data:
+  alertmanager_data:
+  operations_data:
+
+secrets:
+  postgres_password:
+    file: ${SECRETS_DIR:-./secrets/local}/postgres_password
+  app_password:
+    file: ${SECRETS_DIR:-./secrets/local}/app_password
+  migration_password:
+    file: ${SECRETS_DIR:-./secrets/local}/migration_password
+  monitor_password:
+    file: ${SECRETS_DIR:-./secrets/local}/monitor_password
+  session_secret:
+    file: ${SECRETS_DIR:-./secrets/local}/session_secret
+  metrics_token:
+    file: ${SECRETS_DIR:-./secrets/local}/metrics_token
+  admin_password:
+    file: ${SECRETS_DIR:-./secrets/local}/admin_password
+  reception_password:
+    file: ${SECRETS_DIR:-./secrets/local}/reception_password
+  pgadmin_password:
+    file: ${SECRETS_DIR:-./secrets/local}/pgadmin_password
+  grafana_password:
+    file: ${SECRETS_DIR:-./secrets/local}/grafana_password

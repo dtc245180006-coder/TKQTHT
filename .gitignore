@@ -2,9 +2,6 @@
 .tools/
 .vscode/
 
-# The application has its own Git repository; do not add it as an accidental gitlink.
-/hotel-booking/
-
 # Local commands can contain credentials.
 /command.txt
 

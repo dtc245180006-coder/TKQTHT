@@ -1,0 +1,17 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main-content"><section class="section section-alt"><div class="container account-container">
+  <span class="section-tag">BẢO VỆ TÀI KHOẢN</span><h2 class="section-title">Tài khoản của tôi</h2>
+  <p><strong><%= currentUser.name %></strong> · <%= currentUser.username %> · <%= currentUser.role === 'admin' ? 'Quản trị' : 'Lễ tân' %></p>
+  <% if (currentUser.mustChangePassword) { %><p id="passwordChangeRequired" role="alert">Bạn đang dùng mật khẩu tạm. Cần đổi mật khẩu trước khi sử dụng nghiệp vụ.</p><% } %>
+  <div class="table-card account-card"><h3>Đổi mật khẩu</h3><p class="muted">Mật khẩu mới từ 12 đến 128 ký tự. Đổi thành công sẽ đăng xuất tất cả phiên, bao gồm phiên hiện tại.</p>
+    <form id="passwordForm">
+      <div class="form-group"><label for="currentPassword">Mật khẩu hiện tại</label><input id="currentPassword" type="password" required maxlength="128" autocomplete="current-password"></div>
+      <div class="form-group"><label for="newPassword">Mật khẩu mới</label><input id="newPassword" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></div>
+      <div class="form-group"><label for="confirmPassword">Nhập lại mật khẩu mới</label><input id="confirmPassword" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></div>
+      <p id="passwordError" role="alert" hidden></p><button id="changePassword" class="btn btn-gold" type="submit">Đổi mật khẩu và đăng xuất</button>
+    </form>
+  </div>
+  <p class="muted">Quên mật khẩu: liên hệ quản trị để xác minh và nhận mật khẩu tạm. Hệ thống không gửi mật khẩu qua email tự động.</p>
+</div></section></main>
+<%- include('../partials/footer') %>
