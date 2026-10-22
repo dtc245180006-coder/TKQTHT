@@ -21,6 +21,14 @@ Nhận phòng từ 14:00, trả trước 12:00 giờ Việt Nam. Trả sớm kh�
 
 Cần Ubuntu với Docker Engine đang chạy, Docker Compose plugin, Git, OpenSSL và kết nối Internet lần đầu để tải image/dependency. Node.js không cần cài trên máy chủ; script chạy Node 24 trong container. Để làm theo quy trình đã kiểm chứng, dùng Docker Engine 20.10.21 với Compose v2.39.2 trở lên.
 
+Giữ các bước cài công cụ nền bằng lệnh thủ công. Trước khi triển khai, có thể kiểm tra:
+
+```bash
+git --version
+sudo docker info --format 'Docker server: {{.ServerVersion}}'
+sudo docker compose version
+```
+
 Chạy các lệnh sau trong terminal Ubuntu:
 
 ```bash
@@ -34,6 +42,20 @@ bash deploy/install-ubuntu.sh
 Website và Grafana được mở trên mạng máy ảo tại cổng 8000 và 3000. pgAdmin, Prometheus và Alertmanager chỉ bind localhost trên Ubuntu. Cài mới mặc định `SEED_DEMO_DATA=false`, nên cần đăng nhập quản trị và thêm phòng trước khi đặt thử. Không chạy `docker compose down -v` nếu cần giữ dữ liệu.
 
 Nếu `.env` đã có, script giữ nguyên cấu hình và mật khẩu hiện tại. Với môi trường demo mới hoàn toàn, dùng máy ảo mới hoặc clone vào thư mục sạch. Script không yêu cầu chụp ảnh; chỉ ghi nhận ảnh khi bạn đang chuẩn bị báo cáo.
+
+### Làm sạch riêng dự án để triển khai lại
+
+Các lệnh sau giữ Ubuntu, tài khoản, IP, SSH, Docker và Git; chúng xóa database và dữ liệu Grafana của dự án. Chạy trong thư mục `hotel-booking`:
+
+```bash
+sudo docker compose --profile host-observability --profile linux-host-logs down --volumes --remove-orphans
+rm -f .env
+sudo rm -rf ./secrets/local ./backend/node_modules
+git pull --ff-only origin dev
+bash deploy/install-ubuntu.sh
+```
+
+Không chạy `down --volumes` nếu cần giữ dữ liệu đặt phòng, cấu hình Grafana hoặc các volume của dự án. Nếu cũng muốn xóa các bản sao lưu SQL cũ, xóa riêng thư mục `backups`. Các gói phần mềm Ubuntu vẫn được cài thủ công riêng; không dùng `apt purge` để làm sạch dữ liệu ứng dụng.
 
 ### Cài đặt trên Windows
 
