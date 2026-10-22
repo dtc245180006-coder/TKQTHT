@@ -49,20 +49,20 @@ Tài khoản ban đầu lấy từ `STAFF_ADMIN_USERNAME`/`STAFF_ADMIN_PASSWORD`
 | Website (Ubuntu server) | http://IP_UBUNTU:8000 |
 | Đăng nhập | http://IP_UBUNTU:8000/login |
 | pgAdmin | http://localhost:5050 |
-| Grafana | http://localhost:3000 |
+| Grafana (Ubuntu server) | http://IP_UBUNTU:3000 |
 | Prometheus | http://localhost:9090 |
 | Alertmanager | http://localhost:9093 |
 | Hòm cảnh báo cục bộ | http://localhost:9094 |
 
-Website được công bố tại cổng 8000 để máy trong mạng demo truy cập. pgAdmin, Grafana, Prometheus và Alertmanager vẫn chỉ bind localhost trên server; truy cập từ Windows bằng SSH tunnel. `/live` kiểm tra tiến trình; `/ready` và `/health` truy vấn DB thực, trả 503 khi không phục vụ được. `/metrics` chỉ cho giám sát nội bộ có token.
+Website và Grafana được công bố lần lượt tại cổng 8000 và 3000 để máy trong mạng demo truy cập trực tiếp. Giới hạn truy cập các cổng này trong mạng lab bằng firewall; không dùng cấu hình này để công khai Internet. pgAdmin, Prometheus và Alertmanager vẫn chỉ bind localhost trên server; truy cập từ Windows bằng SSH tunnel. `/live` kiểm tra tiến trình; `/ready` và `/health` truy vấn DB thực, trả 503 khi không phục vụ được. `/metrics` chỉ cho giám sát nội bộ có token.
 
 Trên Windows, mở PowerShell và giữ cửa sổ SSH tunnel này chạy:
 
 ```powershell
-ssh -N -L 5050:127.0.0.1:5050 -L 3000:127.0.0.1:3000 -L 9090:127.0.0.1:9090 mrtruong@IP_UBUNTU
+ssh -N -L 5050:127.0.0.1:5050 -L 9090:127.0.0.1:9090 mrtruong@IP_UBUNTU
 ```
 
-Sau đó mở pgAdmin tại `http://localhost:5050`, Grafana tại `http://localhost:3000` và Prometheus tại `http://localhost:9090`. Thay `IP_UBUNTU` bằng địa chỉ máy Ubuntu.
+Sau đó mở pgAdmin tại `http://localhost:5050` và Prometheus tại `http://localhost:9090`. Mở Grafana trực tiếp tại `http://IP_UBUNTU:3000`. Thay `IP_UBUNTU` bằng địa chỉ máy Ubuntu.
 
 ## Chạy, dừng và cập nhật
 
