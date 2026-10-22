@@ -46,15 +46,23 @@ Tài khoản ban đầu lấy từ `STAFF_ADMIN_USERNAME`/`STAFF_ADMIN_PASSWORD`
 
 | Thành phần | Địa chỉ |
 |---|---|
-| Website | http://localhost |
-| Đăng nhập | http://localhost/login |
+| Website (Ubuntu server) | http://IP_UBUNTU:8000 |
+| Đăng nhập | http://IP_UBUNTU:8000/login |
 | pgAdmin | http://localhost:5050 |
 | Grafana | http://localhost:3000 |
 | Prometheus | http://localhost:9090 |
 | Alertmanager | http://localhost:9093 |
 | Hòm cảnh báo cục bộ | http://localhost:9094 |
 
-Các cổng mặc định chỉ bind localhost. `/live` kiểm tra tiến trình; `/ready` và `/health` truy vấn DB thực, trả 503 khi không phục vụ được. `/metrics` chỉ cho giám sát nội bộ có token.
+Website được công bố tại cổng 8000 để máy trong mạng demo truy cập. pgAdmin, Grafana, Prometheus và Alertmanager vẫn chỉ bind localhost trên server; truy cập từ Windows bằng SSH tunnel. `/live` kiểm tra tiến trình; `/ready` và `/health` truy vấn DB thực, trả 503 khi không phục vụ được. `/metrics` chỉ cho giám sát nội bộ có token.
+
+Trên Windows, mở PowerShell và giữ cửa sổ SSH tunnel này chạy:
+
+```powershell
+ssh -N -L 5050:127.0.0.1:5050 -L 3000:127.0.0.1:3000 -L 9090:127.0.0.1:9090 mrtruong@IP_UBUNTU
+```
+
+Sau đó mở pgAdmin tại `http://localhost:5050`, Grafana tại `http://localhost:3000` và Prometheus tại `http://localhost:9090`. Thay `IP_UBUNTU` bằng địa chỉ máy Ubuntu.
 
 ## Chạy, dừng và cập nhật
 
@@ -102,7 +110,22 @@ docker compose logs --tail 100 postgres
 
 Bản sao SQL nằm trong `backups`, có thông tin nhạy cảm: giữ bản sao ngoài máy và phục hồi vào DB riêng để kiểm chứng. Khôi phục cần đúng role/bí mật, nạp bằng `psql -v ON_ERROR_STOP=1`, cấp lại quyền và đối chiếu dữ liệu. Không khôi phục đè DB đang có giao dịch mới mà chưa xử lý chênh lệch.
 
-Ứng dụng dùng quyền DB hạn chế; migration dùng tài khoản riêng. Alloy đọc log backend qua volume, không có Docker socket; Loki giữ 7 ngày. Log Docker tối đa 10 MB × 3 file/container, log app 5 MB × 5 file. Có cảnh báo dịch vụ/DB, lỗi HTTP, đĩa và sao lưu lỗi/cũ. cAdvisor là profile tùy chọn có quyền host, mặc định tắt.
+Ứng dụng dùng quyền DB hạn chế; migration dùng tài khoản riêng. Alloy đọc log backend qua volume, không có Docker socket; Loki giữ 7 ngày. Log Docker tối đa 10 MB × 3 file/container, log app 5 MB × 5 file. Có cảnh báo dịch vụ/DB, lỗi HTTP, đĩa và sao lưu lỗi/cũ. Để lấy số liệu CPU/bộ nhớ container trên Ubuntu, bật profile cAdvisor; collector cần quyền host cao để đọc thống kê kernel. Để đáp ứng bài tập yêu cầu Promtail và xem stdout của toàn bộ container, bật profile Promtail; nó đọc log JSON Docker ở chế độ chỉ đọc, không gắn Docker socket. Promtail là lựa chọn tương thích đề bài; Alloy vẫn được dùng để thu log ứng dụng.
+
+Trên Ubuntu, bật hai thành phần bổ sung sau khi triển khai chính:
+
+```bash
+sudo docker compose --profile host-observability --profile linux-host-logs up -d cadvisor promtail
+sudo docker compose ps cadvisor promtail
+```
+
+Promtail đọc tệp `/var/lib/docker/containers/*/*-json.log`, vì vậy profile này dành cho Linux Docker Engine. Trong Grafana Explore (datasource Loki), có thể kiểm tra bằng LogQL:
+
+```logql
+{job="docker"}
+{job="docker"} |= "error"
+{job="docker", container_id!=""} | json
+```
 
 Trên Windows, có thể cài bộ đo ổ dự án theo phút, chạy khi người dùng đăng nhập:
 
