@@ -119,7 +119,7 @@ sudo docker compose --profile host-observability --profile linux-host-logs up -d
 sudo docker compose ps cadvisor promtail
 ```
 
-Promtail đọc tệp `/var/lib/docker/containers/*/*-json.log`, vì vậy profile này dành cho Linux Docker Engine. Trong Grafana Explore (datasource Loki), có thể kiểm tra bằng LogQL:
+Promtail đọc tệp `/var/lib/docker/containers/*/*-json.log`, bỏ qua bản ghi cũ hơn cửa sổ lưu giữ 168 giờ của Loki, vì vậy không phát lại log quá cũ khi khởi tạo collector. Profile này dành cho Linux Docker Engine. Trong Grafana Explore (datasource Loki), có thể kiểm tra bằng LogQL:
 
 ```logql
 {job="docker"}

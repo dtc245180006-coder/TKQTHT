@@ -21,3 +21,6 @@ scrape_configs:
         target_label: container_id
     pipeline_stages:
       - docker: {}
+      - drop:
+          older_than: 168h
+          drop_counter_reason: outside_loki_retention
