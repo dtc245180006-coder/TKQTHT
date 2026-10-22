@@ -33,7 +33,7 @@ if [[ ! -f .env ]]; then
   chmod 700 secrets secrets/local
   cat > secrets/local/INITIAL-CREDENTIALS.txt <<EOF
 Initial login credentials (generated on first install)
-Website: http://$(hostname -I | awk '{print $1}'):8000
+Website: https://$(hostname -I | awk '{print $1}'):8443
 Staff administrator: admin / $(sed -n 's/^STAFF_ADMIN_PASSWORD=//p' .env)
 Reception: letan / $(sed -n 's/^STAFF_RECEPTION_PASSWORD=//p' .env)
 Grafana: admin / $(sed -n 's/^GRAFANA_PASSWORD=//p' .env)
@@ -45,10 +45,43 @@ EOF
   echo "Created .env and generated demo credentials."
 fi
 
+if grep -q '^COMPOSE_FILE=' .env; then
+  sed -i 's|^COMPOSE_FILE=.*$|COMPOSE_FILE=docker-compose.yml:docker-compose.self-signed.yml|' .env
+else
+  printf '\nCOMPOSE_FILE=docker-compose.yml:docker-compose.self-signed.yml\n' >> .env
+fi
+
 if grep -Eq 'CHANGE_ME' .env; then
   echo "Configure the remaining CHANGE_ME values in .env, then rerun this script." >&2
   exit 1
 fi
+
+server_ip="$(hostname -I | awk '{print $1}')"
+if [[ -z "$server_ip" ]]; then
+  echo "Could not determine the Ubuntu server IP for the HTTPS certificate." >&2
+  exit 1
+fi
+mkdir -p certs/local
+chmod 700 certs certs/local
+if [[ ! -f certs/local/server.crt || ! -f certs/local/server.key ]] \
+  || ! openssl x509 -in certs/local/server.crt -noout -checkend 0 >/dev/null 2>&1 \
+  || ! openssl x509 -in certs/local/server.crt -noout -ext subjectAltName 2>/dev/null | grep -Fq "IP Address:$server_ip"; then
+  cat > certs/local/openssl-san.cnf <<EOF
+[req]
+distinguished_name = distinguished_name
+x509_extensions = server_extensions
+prompt = no
+[distinguished_name]
+CN = $server_ip
+[server_extensions]
+subjectAltName = IP:$server_ip
+EOF
+  openssl req -x509 -nodes -newkey rsa:2048 -sha256 -days 365 \
+    -keyout certs/local/server.key \
+    -out certs/local/server.crt \
+    -config certs/local/openssl-san.cnf
+fi
+chmod 644 certs/local/server.crt certs/local/server.key
 
 echo "Building and deploying the application and observability stack..."
 uid="$(id -u)"
@@ -81,7 +114,8 @@ echo
 echo "Deployment complete. Services:"
 sudo docker compose ps
 echo
-echo "Website:  http://$(hostname -I | awk '{print $1}'):8000"
+echo "Website:  https://$server_ip:8443 (self-signed certificate; browser warning is expected)"
+echo "HTTP redirect: http://$server_ip:8000"
 echo "Grafana:  http://$(hostname -I | awk '{print $1}'):3000"
 echo "Login details (first install only): secrets/local/INITIAL-CREDENTIALS.txt"
 echo "Keep the secrets and data safe; do not run 'docker compose down -v' unless you intend to erase them."

@@ -39,7 +39,7 @@ bash deploy/install-ubuntu.sh
 
 Ở lần chạy đầu, script tự tạo `.env` với mật khẩu ngẫu nhiên, cài dependency trong container, tạo bí mật, sao lưu cơ sở dữ liệu, chạy migration, build backend và bật website cùng các dịch vụ giám sát gồm cAdvisor và Promtail. Tài khoản được ghi vào `secrets/local/INITIAL-CREDENTIALS.txt` với quyền chỉ chủ máy đọc. Giữ thư mục `secrets` và `.env` riêng tư; chúng không được đưa lên Git.
 
-Website và Grafana được mở trên mạng máy ảo tại cổng 8000 và 3000. pgAdmin, Prometheus và Alertmanager chỉ bind localhost trên Ubuntu. Cài mới mặc định `SEED_DEMO_DATA=false`, nên cần đăng nhập quản trị và thêm phòng trước khi đặt thử. Không chạy `docker compose down -v` nếu cần giữ dữ liệu.
+Script tạo chứng chỉ tự ký có SAN cho IP hiện tại của Ubuntu, bật HTTPS ở cổng 8443, chuyển HTTP cổng 8000 sang HTTPS và bật cookie `Secure`/bắt buộc HTTPS ở backend. Trình duyệt sẽ cảnh báo chứng chỉ chưa được CA công khai xác nhận; đây là dự kiến cho chứng chỉ tự ký. Website và Grafana được mở trên mạng máy ảo lần lượt ở cổng 8443 và 3000. pgAdmin, Prometheus và Alertmanager chỉ bind localhost trên Ubuntu. Cài mới mặc định `SEED_DEMO_DATA=false`, nên cần đăng nhập quản trị và thêm phòng trước khi đặt thử. Không chạy `docker compose down -v` nếu cần giữ dữ liệu.
 
 Nếu `.env` đã có, script giữ nguyên cấu hình và mật khẩu hiện tại. Với môi trường demo mới hoàn toàn, dùng máy ảo mới hoặc clone vào thư mục sạch. Script không yêu cầu chụp ảnh; chỉ ghi nhận ảnh khi bạn đang chuẩn bị báo cáo.
 
@@ -86,15 +86,15 @@ Tài khoản ban đầu lấy từ `STAFF_ADMIN_USERNAME`/`STAFF_ADMIN_PASSWORD`
 
 | Thành phần | Địa chỉ |
 |---|---|
-| Website (Ubuntu server) | http://IP_UBUNTU:8000 |
-| Đăng nhập | http://IP_UBUNTU:8000/login |
+| Website (Ubuntu server) | https://IP_UBUNTU:8443 |
+| Đăng nhập | https://IP_UBUNTU:8443/login |
 | pgAdmin | http://localhost:5050 |
 | Grafana (Ubuntu server) | http://IP_UBUNTU:3000 |
 | Prometheus | http://localhost:9090 |
 | Alertmanager | http://localhost:9093 |
 | Hòm cảnh báo cục bộ | http://localhost:9094 |
 
-Website và Grafana được công bố lần lượt tại cổng 8000 và 3000 để máy trong mạng demo truy cập trực tiếp. Giới hạn truy cập các cổng này trong mạng lab bằng firewall; không dùng cấu hình này để công khai Internet. pgAdmin, Prometheus và Alertmanager vẫn chỉ bind localhost trên server; truy cập từ Windows bằng SSH tunnel. `/live` kiểm tra tiến trình; `/ready` và `/health` truy vấn DB thực, trả 503 khi không phục vụ được. `/metrics` chỉ cho giám sát nội bộ có token.
+HTTPS website và Grafana được công bố lần lượt tại cổng 8443 và 3000 để máy trong mạng demo truy cập trực tiếp. HTTP cổng 8000 tự chuyển sang HTTPS. Giới hạn truy cập các cổng này trong mạng lab bằng firewall; chứng chỉ tự ký phù hợp cho demo nhưng trình duyệt sẽ cảnh báo và không dùng cho website công khai. pgAdmin, Prometheus và Alertmanager vẫn chỉ bind localhost trên server; truy cập từ Windows bằng SSH tunnel. `/live` kiểm tra tiến trình; `/ready` và `/health` truy vấn DB thực, trả 503 khi không phục vụ được. `/metrics` chỉ cho giám sát nội bộ có token.
 
 Trên Windows, mở PowerShell và giữ cửa sổ SSH tunnel này chạy:
 
@@ -112,7 +112,7 @@ sudo docker compose ps
 sudo docker compose --profile host-observability --profile linux-host-logs stop
 ```
 
-Sau khi sửa mã, chạy lại `bash deploy/install-ubuntu.sh` để build/cập nhật theo đúng thứ tự migration và quyền. Không dùng `docker compose down -v` khi có dữ liệu cần giữ.
+Sau khi sửa mã, chạy lại `bash deploy/install-ubuntu.sh` để build/cập nhật theo đúng thứ tự migration và quyền. `.env` chọn overlay HTTPS tự ký bằng `COMPOSE_FILE`; không dùng `docker compose down -v` khi có dữ liệu cần giữ.
 
 Chạy giao diện riêng khi phát triển:
 
@@ -175,6 +175,6 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File deploy/windows/install-h
 
 ## Trước khi vận hành công khai
 
-Hiện dùng để chạy thử localhost; cần xử lý/đánh giá các CVE image hạ tầng đã phát hiện, cấu hình tên miền/HTTPS thật và cookie Secure, thay bí mật khởi tạo, chốt sao lưu ngoài máy/RPO/RTO, người nhận cảnh báo và người hỗ trợ. Công cụ cùng máy không tự báo được khi toàn máy ngừng hoạt động.
+Bản Ubuntu hiện bật HTTPS tự ký và cookie Secure cho môi trường demo; khi công khai cần tên miền cùng chứng chỉ được CA tin cậy cấp, rà soát CVE image hạ tầng, thay bí mật khởi tạo, chốt sao lưu ngoài máy/RPO/RTO, người nhận cảnh báo và người hỗ trợ. Công cụ cùng máy không tự báo được khi toàn máy ngừng hoạt động.
 
 Thanh toán kiểm tra thủ công, chưa có cổng thanh toán hoặc hóa đơn điện tử. Chưa có đối soát theo ca hay công nợ cuối ngày quá khứ. Kết quả kỹ thuật không thay nghiệm thu của khách hàng.

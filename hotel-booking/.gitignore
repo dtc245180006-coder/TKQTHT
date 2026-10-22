@@ -10,6 +10,7 @@ data/
 backups/
 certs/*.key
 certs/*.pem
+/certs/local/
 .env.*
 !.env.example
 output/
