@@ -1,4 +1,4 @@
-// Localhost deployment only. See README.md for deployment requirements.
+// Demo deployment. See README.md for host/network requirements.
 const {execFileSync}=require('node:child_process');
 const path=require('node:path');
 const root=path.resolve(__dirname,'../..');
@@ -22,7 +22,7 @@ try {
   compose('up','-d','--no-build','--wait');
   script('secure-pgadmin.cjs');
   compose('restart','nginx');
-  console.log('Local deployment updated. Website and operator ports bind to 127.0.0.1 only.');
+  console.log('Deployment updated. Website and Grafana use the published demo ports; admin tools remain on localhost.');
 } catch {
   console.error('Deployment stopped on error. Do not remove volumes. Resolve the failed step before restarting the application.');
   process.exitCode=1;

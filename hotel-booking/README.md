@@ -17,9 +17,27 @@ Quản trị quản lý danh mục/tài khoản và xóa hồ sơ theo quyền. 
 
 Nhận phòng từ 14:00, trả trước 12:00 giờ Việt Nam. Trả sớm không tự giảm tiền; phí trả muộn nhập có lý do. Phòng phải sẵn sàng trước nhận khách. Thông tin phòng/giá lịch sử và sổ tiền được giữ khi danh mục thay đổi.
 
-## Cài đặt trên Windows
+## Cài nhanh trên Ubuntu
 
-Cần Docker Desktop chạy Linux containers/WSL 2, Docker Compose, Node.js 24 trên máy vận hành và Internet để tải image/dependency lần đầu.
+Cần Ubuntu với Docker Engine đang chạy, Docker Compose plugin, Git, OpenSSL và kết nối Internet lần đầu để tải image/dependency. Node.js không cần cài trên máy chủ; script chạy Node 24 trong container. Để làm theo quy trình đã kiểm chứng, dùng Docker Engine 20.10.21 với Compose v2.39.2 trở lên.
+
+Chạy các lệnh sau trong terminal Ubuntu:
+
+```bash
+git clone -b dev https://github.com/dtc245180006-coder/TKQTHT.git
+cd TKQTHT/hotel-booking
+bash deploy/ubuntu-demo.sh
+```
+
+Ở lần chạy đầu, script tự tạo `.env` với mật khẩu ngẫu nhiên, cài dependency trong container, tạo bí mật, sao lưu cơ sở dữ liệu, chạy migration, build backend và bật website cùng các dịch vụ giám sát gồm cAdvisor và Promtail. Tài khoản được ghi vào `secrets/local/INITIAL-CREDENTIALS.txt` với quyền chỉ chủ máy đọc. Giữ thư mục `secrets` và `.env` riêng tư; chúng không được đưa lên Git.
+
+Website và Grafana được mở trên mạng máy ảo tại cổng 8000 và 3000. pgAdmin, Prometheus và Alertmanager chỉ bind localhost trên Ubuntu. Cài mới mặc định `SEED_DEMO_DATA=false`, nên cần đăng nhập quản trị và thêm phòng trước khi đặt thử. Không chạy `docker compose down -v` nếu cần giữ dữ liệu.
+
+Nếu `.env` đã có, script giữ nguyên cấu hình và mật khẩu hiện tại. Với môi trường demo mới hoàn toàn, dùng máy ảo mới hoặc clone vào thư mục sạch. Script không yêu cầu chụp ảnh; chỉ ghi nhận ảnh khi bạn đang chuẩn bị báo cáo.
+
+### Cài đặt trên Windows
+
+Cần Docker Desktop chạy Linux containers/WSL 2, Docker Compose và Node.js 24 nếu muốn chạy quy trình cập nhật trực tiếp trên Windows.
 
 Mở PowerShell trong thư mục `hotel-booking`:
 
@@ -38,7 +56,7 @@ docker compose config --quiet
 node backend/scripts/secure-deploy.cjs
 ```
 
-Quy trình chuẩn bị bí mật, sao lưu, chạy migration bằng tài khoản riêng, cấp quyền ứng dụng rồi khởi động dịch vụ. PostgreSQL không công bố cổng ra máy ngoài. Cài mới mặc định `SEED_DEMO_DATA=false`, không nạp phòng/khách/đơn mẫu: quản trị nhập danh mục phòng trước khi sử dụng.
+Quy trình chuẩn bị bí mật, sao lưu, chạy migration bằng tài khoản riêng, cấp quyền ứng dụng rồi khởi động dịch vụ.
 
 Tài khoản ban đầu lấy từ `STAFF_ADMIN_USERNAME`/`STAFF_ADMIN_PASSWORD` và `STAFF_RECEPTION_USERNAME`/`STAFF_RECEPTION_PASSWORD`. Chỉ tạo khi username chưa tồn tại; sửa `.env` không tự đổi mật khẩu hoặc mở khóa tài khoản đã lưu. Dùng trang Nhân viên để quản lý tài khoản.
 
@@ -66,13 +84,13 @@ Sau đó mở pgAdmin tại `http://localhost:5050` và Prometheus tại `http:/
 
 ## Chạy, dừng và cập nhật
 
-```powershell
-docker compose up -d --wait
-docker compose ps
-docker compose stop
+```bash
+sudo docker compose --profile host-observability --profile linux-host-logs up -d --wait
+sudo docker compose ps
+sudo docker compose --profile host-observability --profile linux-host-logs stop
 ```
 
-Sau khi sửa mã, dùng `node backend/scripts/secure-deploy.cjs` để build/cập nhật theo đúng thứ tự migration và quyền. Không dùng `docker compose down -v` khi có dữ liệu cần giữ.
+Sau khi sửa mã, chạy lại `bash deploy/ubuntu-demo.sh` để build/cập nhật theo đúng thứ tự migration và quyền. Không dùng `docker compose down -v` khi có dữ liệu cần giữ.
 
 Chạy giao diện riêng khi phát triển:
 
