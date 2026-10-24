@@ -1,0 +1,52 @@
+groups:
+  - name: hotel-operations
+    rules:
+      - alert: HotelServiceDown
+        expr: hotel_probe_success == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: 'Dich vu khong san sang; xem README.md'}
+      - alert: HotelScrapeDown
+        expr: up == 0
+        for: 1m
+        labels: {severity: critical}
+      - alert: HotelDatabaseDown
+        expr: pg_up == 0
+        for: 1m
+        labels: {severity: critical}
+      - alert: HotelHighErrorRate
+        expr: sum(rate(hotel_http_requests_total{status_code=~"5.."}[5m])) / clamp_min(sum(rate(hotel_http_requests_total[5m])), 0.01) > 0.05 and sum(increase(hotel_http_requests_total{status_code=~"5.."}[5m])) >= 5
+        for: 2m
+        labels: {severity: warning}
+      - alert: HotelDiskAlmostFull
+        expr: hotel_disk_free_ratio < 0.15
+        for: 5m
+        labels: {severity: warning}
+      - alert: HotelDiskCritical
+        expr: hotel_disk_free_ratio < 0.05
+        for: 1m
+        labels: {severity: critical}
+      - alert: HotelBackupFailed
+        expr: hotel_backup_last_attempt_success == 0 and hotel_backup_last_attempt_timestamp_seconds > 0
+        for: 1m
+        labels: {severity: critical}
+      - alert: HotelBackupMissingOrOld
+        expr: time() - hotel_backup_last_success_timestamp_seconds > 93600
+        for: 5m
+        labels: {severity: warning}
+      - alert: HotelHostObserverStale
+        expr: time() - hotel_host_observation_timestamp_seconds > 180
+        for: 2m
+        labels: {severity: warning}
+      - alert: HotelProbeStale
+        expr: time() - hotel_probe_timestamp_seconds > 60
+        for: 1m
+        labels: {severity: critical}
+      - alert: HotelNotificationFailure
+        expr: increase(alertmanager_notifications_failed_total[5m]) > 0
+        for: 1m
+        labels: {severity: critical}
+      - alert: HotelLogDeliveryDropped
+        expr: sum(increase(loki_write_dropped_entries_total[5m])) > 0
+        for: 1m
+        labels: {severity: warning}

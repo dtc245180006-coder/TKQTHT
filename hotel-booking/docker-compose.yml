@@ -159,6 +159,143 @@ services:
     security_opt:
       - no-new-privileges:true
 
+  postgres-exporter:
+    logging: *bounded_logs
+    mem_limit: 128m
+    cpus: "0.25"
+    pids_limit: 256
+    cap_drop: [ALL]
+    secrets: [monitor_password]
+    image: prometheuscommunity/postgres-exporter:v0.20.1
+    environment:
+      DATA_SOURCE_URI: postgres:5432/${POSTGRES_DB}?sslmode=disable
+      DATA_SOURCE_USER: hotel_monitor
+      DATA_SOURCE_PASS_FILE: /run/secrets/monitor_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - monitoring
+      - data
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+
+  cadvisor:
+    logging: *bounded_logs
+    mem_limit: 256m
+    cpus: "0.5"
+    pids_limit: 256
+    profiles: [host-observability]
+    image: ghcr.io/google/cadvisor:0.55.1
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  prometheus:
+    logging: *bounded_logs
+    mem_limit: 512m
+    cpus: "1"
+    pids_limit: 256
+    cap_drop: [ALL]
+    secrets: [metrics_token]
+    image: prom/prometheus:v3
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --storage.tsdb.retention.size=1GB
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+      - postgres-exporter
+    networks:
+      - monitoring
+      - admin
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  alertmanager:
+    logging: *bounded_logs
+    mem_limit: 128m
+    cpus: "0.25"
+    pids_limit: 256
+    image: prom/alertmanager:v0.34.1
+    command: [--config.file=/etc/alertmanager/alertmanager.yml, --storage.path=/alertmanager, --data.retention=168h, --cluster.listen-address=]
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    ports: ["9093:9093"]
+    networks: [monitoring, admin]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+
+  operations:
+    logging: *bounded_logs
+    mem_limit: 128m
+    cpus: "0.5"
+    pids_limit: 256
+    image: ${BACKEND_IMAGE:-hotel-booking-backend:latest}
+    command: [node, ops/server.cjs]
+    volumes:
+      - operations_data:/var/lib/hotel-ops
+      - ./output/operations:/observations:ro
+    ports: ["9094:9094"]
+    networks: [monitoring, edge, admin]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, wget, --spider, -q, http://127.0.0.1:9094/health]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+
+  grafana:
+    logging: *bounded_logs
+    mem_limit: 512m
+    cpus: "1"
+    pids_limit: 256
+    cap_drop: [ALL]
+    secrets: [grafana_password]
+    image: grafana/grafana:12.4.11
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+      - admin
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
 networks:
   edge:
   admin:
