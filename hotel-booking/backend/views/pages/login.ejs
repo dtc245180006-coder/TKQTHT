@@ -1,0 +1,26 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main-content" class="login-page">
+  <section class="login-card" aria-labelledby="loginTitle">
+    <span class="section-tag">AURORA HAVEN</span>
+    <h1 id="loginTitle" class="section-title">Đăng nhập nhân viên</h1>
+    <p class="muted">Sử dụng tài khoản được cấp để quản lý công việc tại khách sạn.</p>
+    <% if (passwordChanged) { %><p role="status">Đã đổi mật khẩu và đăng xuất các phiên cũ. Hãy đăng nhập bằng mật khẩu mới.</p><% } %>
+    <form id="loginForm">
+      <input type="hidden" id="nextPath" value="<%= nextPath %>">
+      <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input id="username" name="username" autocomplete="username" required maxlength="64" autofocus>
+      </div>
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128">
+      </div>
+      <p id="loginError" class="login-error" role="alert" hidden></p>
+      <button id="loginSubmit" type="submit" class="btn btn-gold btn-block">Đăng nhập</button>
+    </form>
+    <p class="muted">Quên mật khẩu? Liên hệ quản trị để xác minh và nhận mật khẩu tạm.</p>
+    <a href="/" class="login-back">← Quay lại tìm phòng</a>
+  </section>
+</main>
+<%- include('../partials/footer') %>

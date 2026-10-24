@@ -1,0 +1,29 @@
+<%- include('../partials/head') %><%- include('../partials/header') %>
+<main id="main-content"><section class="section"><div class="container">
+  <h2 class="section-title">Thanh toán và đối soát</h2>
+  <p>Ngày ghi sổ theo giờ Việt Nam. Thu/hoàn thông thường được tách khỏi bút toán sửa sai; thu ròng = thu − hoàn + điều chỉnh sổ. Chưa mở/đóng ca.</p>
+  <form id="financeReportForm" class="toolbar"><label for="financeDate">Ngày ghi sổ</label><input id="financeDate" type="date" required><button class="btn btn-outline" type="submit">Xem báo cáo</button></form>
+  <div id="financeTotals" class="stay-balance" aria-live="polite"></div>
+  <div class="table-card table-responsive"><table class="data-table"><thead><tr><th>Phương thức</th><th>Thu ban đầu/bổ sung</th><th>Hoàn thực ghi</th><th>Điều chỉnh sổ</th><th>Thu ròng ghi sổ</th></tr></thead><tbody id="financeMethodBody"></tbody></table></div>
+  <h3>Ghi nhận đối soát ngày</h3>
+  <p>Nhập số thu ròng kiểm chứng từ sổ tiền mặt/sao kê cho từng phương thức; có thể âm khi hoàn nhiều hơn thu. Không nhập số dư tài khoản ngân hàng thay cho thu ròng trong ngày. Điều chỉnh sổ không tự chuyển tiền.</p>
+  <form id="financeReconcileForm">
+    <div class="form-row"><div class="form-group"><label for="actualCash">Tiền mặt đối chiếu</label><input id="actualCash" type="number" step="0.01" required></div><div class="form-group"><label for="actualBank">Chuyển khoản đối chiếu</label><input id="actualBank" type="number" step="0.01" required></div><div class="form-group"><label for="actualWallet">Ví điện tử đối chiếu</label><input id="actualWallet" type="number" step="0.01" required></div></div>
+    <div class="form-group"><label for="reconcileReason">Căn cứ đối soát / lý do chênh lệch</label><input id="reconcileReason" required minlength="5" maxlength="500"></div><button id="saveReconciliation" class="btn btn-gold" type="submit">Lưu biên bản đối soát</button>
+  </form>
+  <ul id="reconciliationHistory" class="stay-events"></ul>
+  <h3>Phiếu trong ngày</h3><p id="financeEntryLimit" class="muted"></p>
+  <div class="table-card table-responsive"><table class="data-table"><thead><tr><th>Phiếu / đơn</th><th>Thời gian</th><th>Loại ghi sổ</th><th>Số tiền có dấu</th><th>Phương thức / tham chiếu</th><th>Nhân viên</th></tr></thead><tbody id="financeEntryBody"></tbody></table></div>
+  <h3>Công nợ hiện tại</h3><p id="financeDebtNote" class="muted"></p>
+  <div class="table-card table-responsive"><table class="data-table"><thead><tr><th>Đơn</th><th>Khách</th><th>Phải thanh toán</th><th>Đã thu ròng</th><th>Còn thu</th></tr></thead><tbody id="financeDebtBody"></tbody></table></div>
+  <h3>Yêu cầu sửa sai / thanh toán sau trả phòng</h3><p>Lập yêu cầu trong lịch sử từng đơn. Yêu cầu chờ duyệt chưa làm thay đổi sổ; quản trị duyệt sau khi kiểm tra chứng từ và xác nhận mật khẩu.</p>
+  <div class="table-card table-responsive"><table class="data-table"><thead><tr><th>Yêu cầu / đơn</th><th>Nội dung</th><th>Người lập</th><th>Trạng thái / xử lý</th></tr></thead><tbody id="financeRequestBody"></tbody></table></div>
+</div></section></main>
+<% if(currentUser.role==='admin'){ %>
+<div id="financeApprovalDialog" class="modal" role="dialog" aria-modal="true" aria-labelledby="approvalTitle"><div class="modal-backdrop" data-close-approval></div><div class="modal-dialog"><div class="modal-content">
+  <div class="modal-header"><h3 id="approvalTitle">Duyệt yêu cầu</h3><button type="button" class="btn-close" data-close-approval aria-label="Đóng">&times;</button></div>
+  <form id="financeApprovalForm"><div class="modal-body"><p id="approvalSummary"></p><div class="form-group"><label for="approvalReason">Lý do quyết định</label><input id="approvalReason" required minlength="5" maxlength="500"></div><div class="form-group"><label for="approvalPassword">Mật khẩu hiện tại</label><input id="approvalPassword" type="password" required autocomplete="current-password"></div><label id="approvalConfirmedLabel"><input id="approvalConfirmed" type="checkbox"> Đã đối chiếu chứng từ và tiền thực tế. Bút toán sửa sổ không tự chuyển tiền.</label></div>
+  <div class="modal-footer"><button class="btn btn-outline" type="button" data-close-approval>Đóng</button><button id="saveFinanceDecision" class="btn btn-gold" type="submit">Xác nhận quyết định</button></div></form>
+</div></div></div>
+<% } %>
+<%- include('../partials/footer') %>

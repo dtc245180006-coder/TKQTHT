@@ -1,0 +1,23 @@
+<section id="stayOperations">
+  <h4>Điều chỉnh lưu trú</h4>
+  <p class="muted">Nhận từ 14:00 · Trả phòng 12:00 (giờ Việt Nam). Trả sớm không tự giảm tiền; trả muộn ghi phụ thu riêng. Điều chỉnh lưu thành phiên bản mới, giữ bản gốc.</p>
+  <div class="form-row">
+    <div class="form-group"><label for="stayAction">Thao tác</label><select id="stayAction">
+      <option value="extend">Gia hạn</option><option value="move">Đổi phòng</option><option value="charge">Phụ thu / dịch vụ</option><option value="void-charge">Hủy khoản phụ thu đã ghi sai</option>
+    </select></div>
+    <div class="form-group" data-stay-field="extend"><label for="stayNewCheckout">Ngày trả mới</label><input id="stayNewCheckout" type="date"></div>
+    <div class="form-group" data-stay-field="move" hidden><label for="stayNewRoom">Phòng mới (giá/đêm hiện tại)</label><select id="stayNewRoom"></select></div>
+    <div class="form-group" data-stay-field="void-charge" hidden><label for="stayVoidCharge">Khoản phụ thu cần hủy</label><select id="stayVoidCharge"></select></div>
+  </div>
+  <div class="form-group" id="legacyCreditField" hidden><label for="stayAgreedCredit">Đơn cũ đang ở: khoản giảm phòng cũ đã đối chiếu/thỏa thuận (VNĐ, có thể bằng 0)</label><input id="stayAgreedCredit" type="number" min="0" step="0.01"><p>Đối chiếu chứng từ và ghi căn cứ trong lý do; hệ thống giữ giá trị cũ, trừ khoản giảm này rồi cộng tiền phòng mới cho đêm còn lại. Không suy ra đơn giá cũ.</p></div>
+  <div data-stay-field="charge" hidden>
+    <div class="form-group"><label for="stayChargeLabel">Tên dịch vụ / phụ thu</label><input id="stayChargeLabel" maxlength="120"></div>
+    <div class="form-row"><div class="form-group"><label for="stayQuantity">Số lượng</label><input id="stayQuantity" type="number" min="1" max="1000" value="1"></div><div class="form-group"><label for="stayUnitPrice">Đơn giá (VNĐ)</label><input id="stayUnitPrice" type="number" min="0.01" step="0.01"></div></div>
+  </div>
+  <div class="form-group"><label for="stayReason">Lý do điều chỉnh (5–500 ký tự)</label><input id="stayReason" minlength="5" maxlength="500"></div>
+  <p id="stayQuote" aria-live="polite" class="muted"></p>
+  <button type="button" id="saveStayOperation" class="btn btn-outline">Xác nhận điều chỉnh</button>
+</section>
+<h4>Lịch sử điều chỉnh / giá gốc</h4>
+<div id="stayOriginal" class="muted"></div>
+<ul id="stayRevisions" class="stay-events"></ul>

@@ -1,0 +1,44 @@
+# Docker Compose v2.24.4+ (!override). Only public ingress is Caddy.
+services:
+  backend:
+    environment:
+      SESSION_COOKIE_SECURE: "true"
+      REQUIRE_HTTPS: "true"
+  nginx:
+    networks: [edge, tls_ingress]
+    ports: !override []
+    volumes: !override
+      - ./nginx/https-upstream.conf:/etc/nginx/conf.d/default.conf:ro
+  caddy:
+    logging:
+      driver: local
+      options: {max-size: "10m", max-file: "3"}
+    mem_limit: 128m
+    cpus: "0.5"
+    pids_limit: 128
+    image: caddy:2.11-alpine
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?Set a real DNS hostname}
+      ACME_EMAIL: ${ACME_EMAIL:?Set certificate contact email}
+    ports:
+      - "80:8080"
+      - "443:8443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [tls_ingress]
+    depends_on: [nginx]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+volumes:
+  caddy_data:
+  caddy_config:
+networks:
+  tls_ingress:
+    ipam:
+      config:
+        - subnet: 172.31.240.0/28

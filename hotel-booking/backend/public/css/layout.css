@@ -1,0 +1,229 @@
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-container {
+  display: grid;
+  grid-template-areas: "brand menu action";
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 24px;
+  max-width: 1560px;
+  min-height: 72px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.brand {
+  grid-area: brand;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand-name {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--primary);
+  display: block;
+  line-height: 1.1;
+}
+
+.brand-sub {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  color: var(--gold);
+  font-weight: 700;
+  display: block;
+}
+
+.nav-menu {
+  grid-area: menu;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  min-width: 0;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 15px;
+  transition: color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--gold);
+}
+
+.booking-count-badge {
+  background-color: var(--gold);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-left: 6px;
+  font-weight: 700;
+}
+
+.section {
+  padding: 60px 0;
+}
+
+.section-alt {
+  background-color: #f1f5f9;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.section-tag {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.footer {
+  background: var(--primary);
+  color: #94a3b8;
+  padding: 40px 0;
+  font-size: 14px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer-title {
+  color: #fff;
+  font-weight: 700;
+}
+
+.section-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-size: 32px;
+}
+
+.section-alt {
+  background: #f0f2eb;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 40px 0;
+  }
+
+  .section-title {
+    font-size: 27px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+  }
+
+  .nav-action .btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1;
+}
+.nav-action {
+  grid-area: action;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+.nav-action .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.staff-identity {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+.staff-identity small {
+  color: var(--text-muted);
+}
+.staff-identity {
+  max-width: 180px;
+  min-width: 0;
+}
+.staff-identity strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-link {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+@media (max-width: 1400px) {
+  .nav-container {
+    grid-template-areas: "brand action" "menu menu";
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 12px 24px;
+  }
+  .nav-menu {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 18px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .nav-action {
+    max-width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .nav-container {
+    column-gap: 12px;
+  }
+  .brand {
+    gap: 8px;
+  }
+  .staff-identity {
+    display: none;
+  }
+}

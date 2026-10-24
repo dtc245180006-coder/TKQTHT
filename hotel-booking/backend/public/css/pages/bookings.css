@@ -1,0 +1,49 @@
+.booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 155px;
+}
+.booking-actions button:disabled {
+  cursor: not-allowed;
+}
+.stay-dialog {
+  max-width: 850px;
+  overflow-wrap: anywhere;
+}
+.stay-dialog .form-group {
+  min-width: 0;
+}
+.stay-dialog select,
+.stay-dialog input:not([type="checkbox"]) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.stay-dialog input[type="checkbox"] { width: auto; }
+.stay-balance {
+  padding: 14px;
+  margin: 16px 0;
+  background: var(--gold-light);
+  border-radius: var(--radius-sm);
+}
+#paymentFields {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+#paymentFields legend {
+  padding: 0 8px;
+  font-weight: 600;
+}
+.stay-history-title {
+  margin: 24px 0 12px;
+}
+.stay-events {
+  padding-left: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.stay-events li {
+  margin-bottom: 8px;
+}

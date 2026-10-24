@@ -1,0 +1,56 @@
+<div class="modal" id="stayDialog" role="dialog" aria-modal="true" aria-labelledby="stayTitle">
+  <div class="modal-backdrop" data-close-stay></div>
+  <div class="modal-dialog stay-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="stayTitle">Thanh toán và lịch sử</h3>
+        <button type="button" class="btn-close" data-close-stay aria-label="Đóng">&times;</button>
+      </div>
+      <form id="paymentForm">
+        <div class="modal-body">
+          <p id="stayGuest" class="muted"></p>
+          <div id="staySnapshot" class="stay-balance"></div>
+          <div id="stayBalance" class="stay-balance" aria-live="polite"></div>
+          <%- include('stay-operations') %>
+          <fieldset id="paymentFields">
+            <legend>Ghi nhận thu / hoàn tiền tại quầy</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="paymentKind">Loại giao dịch</label>
+                <select id="paymentKind"><option value="payment">Thu tiền / tiền cọc</option><option value="refund">Hoàn tiền</option></select>
+              </div>
+              <div class="form-group">
+                <label for="paymentAmount">Số tiền (VNĐ)</label>
+                <input type="number" id="paymentAmount" required min="0.01" step="0.01">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="paymentMethod">Phương thức</label>
+              <select id="paymentMethod"><option value="cash">Tiền mặt</option><option value="bank_transfer">Chuyển khoản đã xác nhận</option><option value="wallet">Ví điện tử đã xác nhận</option></select>
+            </div>
+            <div class="form-group">
+              <label for="paymentReference">Mã giao dịch / ghi chú</label>
+              <input id="paymentReference" maxlength="200" placeholder="Mã chuyển khoản hoặc nội dung thu / hoàn">
+            </div>
+            <p class="muted">Chỉ ghi nhận sau khi đã kiểm tra giao dịch thực tế.</p>
+            <label><input id="paymentConfirmed" type="checkbox" required> Đã kiểm tra tiền thực nhận/thực hoàn; mã tham chiếu chuyển khoản/ví là mã giao dịch thật.</label>
+          </fieldset>
+          <h4 class="stay-history-title">Các khoản thu / hoàn</h4>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead><tr><th>Thời gian</th><th>Giao dịch</th><th>Số tiền</th><th>Phương thức / ghi chú</th><th>Nhân viên</th></tr></thead>
+              <tbody id="paymentHistory"></tbody>
+            </table>
+          </div>
+          <%- include('finance-request') %>
+          <h4 class="stay-history-title">Lịch sử lưu trú</h4>
+          <ul id="stayEvents" class="stay-events"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-close-stay>Đóng</button>
+          <button type="submit" class="btn btn-gold" id="recordPayment">Ghi nhận thu tiền</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

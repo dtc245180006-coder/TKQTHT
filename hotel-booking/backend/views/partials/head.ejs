@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <title><%= title %> | Aurora Haven</title>
+  <link rel="stylesheet" href="/css/base.css?v=original-navy-2">
+  <link rel="stylesheet" href="/css/layout.css?v=original-navy-2">
+  <link rel="stylesheet" href="/css/components.css?v=original-navy-2">
+  <% for (const stylesheet of stylesheets) { %>
+  <link rel="stylesheet" href="<%= stylesheet %>?v=original-navy-2">
+  <% } %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body data-role="<%= currentUser ? currentUser.role : 'guest' %>" data-user-id="<%= currentUser ? currentUser.id : '' %>">

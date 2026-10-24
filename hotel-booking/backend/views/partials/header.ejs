@@ -1,0 +1,34 @@
+<header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand">
+        <div class="brand-text">
+          <span class="brand-name">AURORA HAVEN</span>
+          <span class="brand-sub">HOTEL & RESORT</span>
+        </div>
+      </a>
+      <nav class="nav-menu">
+        <a href="/" class="nav-link <%= activePage === 'rooms' ? 'active' : '' %>" <%- activePage === 'rooms' ? 'aria-current="page"' : '' %>>Phòng nghỉ</a>
+        <% if (currentUser && !currentUser.mustChangePassword) { %>
+          <a href="/bookings" class="nav-link <%= activePage === 'bookings' ? 'active' : '' %>" <%- activePage === 'bookings' ? 'aria-current="page"' : '' %>>Đặt phòng <span class="booking-count-badge" id="bookingCountBadge">0</span></a>
+          <a href="/customers" class="nav-link <%= activePage === 'customers' ? 'active' : '' %>" <%- activePage === 'customers' ? 'aria-current="page"' : '' %>>Khách hàng</a>
+          <a href="/housekeeping" class="nav-link <%= activePage === 'housekeeping' ? 'active' : '' %>" <%- activePage === 'housekeeping' ? 'aria-current="page"' : '' %>>Dọn phòng</a>
+          <a href="/finance" class="nav-link <%= activePage === 'finance' ? 'active' : '' %>" <%- activePage === 'finance' ? 'aria-current="page"' : '' %>>Đối soát</a>
+          <% if (currentUser.role === 'admin') { %>
+            <a href="/manage-rooms" class="nav-link <%= activePage === 'manage-rooms' ? 'active' : '' %>" <%- activePage === 'manage-rooms' ? 'aria-current="page"' : '' %>>Quản lý phòng</a>
+            <a href="/staff" class="nav-link <%= activePage === 'staff' ? 'active' : '' %>" <%- activePage === 'staff' ? 'aria-current="page"' : '' %>>Nhân viên</a>
+          <% } %>
+        <% } %>
+        <% if (currentUser) { %>
+          <a href="/account" class="nav-link <%= activePage === 'account' ? 'active' : '' %>" <%- activePage === 'account' ? 'aria-current="page"' : '' %>>Tài khoản</a>
+        <% } %>
+      </nav>
+      <div class="nav-action">
+        <% if (currentUser) { %>
+          <span class="staff-identity"><strong><%= currentUser.name %></strong><small><%= currentUser.role === 'admin' ? 'Quản trị' : 'Lễ tân' %></small></span>
+          <button type="button" class="btn btn-outline btn-sm" id="logoutButton">Đăng xuất</button>
+        <% } else { %>
+          <a href="/login" class="btn btn-primary">Đăng nhập nhân viên</a>
+        <% } %>
+      </div>
+    </div>
+  </header>

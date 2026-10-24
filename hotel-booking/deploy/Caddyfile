@@ -1,0 +1,10 @@
+{
+  email {$ACME_EMAIL}
+  http_port 8080
+  https_port 8443
+  admin off
+}
+{$SITE_ADDRESS} {
+  header Strict-Transport-Security "max-age=31536000"
+  reverse_proxy nginx:8080
+}
