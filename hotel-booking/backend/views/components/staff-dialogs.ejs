@@ -1,0 +1,25 @@
+<div class="modal" id="staffDialog" role="dialog" aria-modal="true" aria-labelledby="staffDialogTitle">
+  <div class="modal-backdrop" data-close-staff></div><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h3 id="staffDialogTitle"></h3><button type="button" class="btn-close" data-close-staff aria-label="Đóng">&times;</button></div>
+    <form id="staffForm" autocomplete="off"><div class="modal-body">
+      <p id="staffDialogNote" class="muted"></p>
+      <fieldset id="staffDetails" class="staff-fields">
+        <div class="form-group"><label for="staffUsername">Tên đăng nhập</label><input id="staffUsername" required minlength="3" maxlength="64" pattern="[a-zA-Z0-9._-]{3,64}" autocomplete="off"></div>
+        <div class="form-group"><label for="staffDisplayName">Tên hiển thị</label><input id="staffDisplayName" required minlength="2" maxlength="120"></div>
+        <div class="form-group"><label for="staffRole">Vai trò</label><select id="staffRole"><option value="receptionist">Lễ tân</option><option value="admin">Quản trị</option></select></div>
+        <label><input id="staffActive" type="checkbox" checked> Đang hoạt động</label>
+      </fieldset>
+      <div class="form-group"><label for="staffReason">Lý do thao tác</label><input id="staffReason" required minlength="3" maxlength="300" placeholder="Ví dụ: nhân viên mới hoặc kết thúc ca làm việc"></div>
+      <div class="form-group"><label for="staffAdminPassword">Mật khẩu hiện tại của quản trị</label><input id="staffAdminPassword" type="password" required maxlength="128" autocomplete="current-password"></div>
+    </div><div class="modal-footer"><button type="button" class="btn btn-outline" data-close-staff>Hủy bỏ</button><button id="saveStaff" type="submit" class="btn btn-gold">Xác nhận</button></div></form>
+  </div></div>
+</div>
+<div class="modal" id="credentialDialog" role="dialog" aria-modal="true" aria-labelledby="credentialTitle">
+  <div class="modal-backdrop" data-close-credential></div><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h3 id="credentialTitle">Mật khẩu tạm — chỉ hiển thị lần này</h3><button type="button" class="btn-close" data-close-credential aria-label="Đóng">&times;</button></div>
+    <div class="modal-body"><p id="credentialUsername"></p><p>Mật khẩu tạm có hiệu lực 24 giờ. Giao qua kênh riêng cho đúng nhân viên; nhân viên phải đổi mật khẩu khi đăng nhập. Sau khi đóng hộp thoại, không thể xem lại mật khẩu tạm này.</p>
+      <div class="form-group"><label for="temporaryPassword">Mật khẩu tạm</label><input id="temporaryPassword" type="password" readonly autocomplete="off" spellcheck="false"></div>
+      <button type="button" id="showTemporaryPassword" class="btn btn-outline">Hiện / ẩn mật khẩu</button>
+    </div><div class="modal-footer"><button type="button" class="btn btn-gold" data-close-credential>Đã bàn giao, đóng</button></div>
+  </div></div>
+</div>

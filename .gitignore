@@ -1,0 +1,21 @@
+# Local tooling and editor state
+.tools/
+.vscode/
+
+# Local commands can contain credentials.
+/command.txt
+
+# Secrets, runtime data and generated artifacts
+.env
+.env.*
+!.env.example
+*.log
+*.sql
+*.dump
+*.backup
+backups/
+output/
+node_modules/
+coverage/
+*.key
+*.pem

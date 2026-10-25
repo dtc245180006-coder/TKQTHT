@@ -1,0 +1,15 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main-content"><section class="section section-alt"><div class="container">
+  <div class="section-header"><div><span class="section-tag">QUẢN TRỊ TRUY CẬP</span><h2 class="section-title">Tài khoản nhân viên</h2><p class="muted">Mỗi nhân viên dùng tài khoản riêng. Khóa, đổi quyền hoặc đặt lại mật khẩu sẽ thu hồi các phiên cũ.</p></div><button id="addStaff" class="btn btn-gold">+ Thêm nhân viên</button></div>
+  <p class="muted">Lễ tân được xử lý đơn, nhận/trả phòng, thu và hoàn tiền, thêm/sửa khách hàng. Chỉ quản trị được quản lý tài khoản, danh mục phòng, xóa hồ sơ chưa có lịch sử và xem nhật ký này.</p>
+  <div class="toolbar"><input id="staffSearch" type="search" aria-label="Tìm nhân viên" placeholder="Tìm tên hoặc tài khoản"><button id="refreshStaff" class="btn btn-outline">Làm mới</button></div>
+  <p id="staffError" role="alert" hidden></p>
+  <div class="table-card table-responsive"><table class="data-table"><thead><tr><th>Nhân viên</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="staffBody"></tbody></table></div>
+  <h3 class="staff-audit-title">Nhật ký tài khoản, phòng và khách hàng</h3>
+  <p class="muted">Lịch sử đặt phòng và thu/hoàn tiền xem trong từng đơn. Nhật ký không có chức năng sửa hoặc xóa.</p>
+  <div class="table-card table-responsive"><table class="data-table"><thead><tr><th>Thời điểm</th><th>Người thực hiện</th><th>Thao tác</th><th>Đối tượng / lý do</th></tr></thead><tbody id="staffAuditBody"></tbody></table></div>
+  <button id="moreAudit" class="btn btn-outline" hidden>Tải thêm nhật ký</button>
+</div></section></main>
+<%- include('../components/staff-dialogs') %>
+<%- include('../partials/footer') %>

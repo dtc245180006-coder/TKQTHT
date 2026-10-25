@@ -1,0 +1,18 @@
+<%- include('../partials/head') %><%- include('../partials/header') %>
+<main id="main-content"><section class="section"><article class="container receipt-card">
+  <h2><%= payment.entry_type==='reversal'?'Bút toán đảo':payment.entry_type==='replacement'?'Phiếu thay thế':payment.kind==='payment'?'Phiếu thu':'Phiếu hoàn tiền' %></h2>
+  <p><strong id="receiptCode"><%= payment.receipt_code %></strong> · Đơn #<%= payment.booking_id %></p>
+  <p>Thời điểm ghi sổ: <%= timestamp(payment.created_at) %> (giờ Việt Nam)</p>
+  <p>Người ghi: <strong><%= payment.staff_name %></strong> · Mã nhân viên <%= payment.staff_user_id %></p>
+  <% if(payment.receipt_snapshot){ %>
+    <p>Khách: <%= payment.receipt_snapshot.customer_name %> · <%= payment.receipt_snapshot.customer_phone %></p>
+    <p>Phòng tại thời điểm ghi: <%= payment.receipt_snapshot.room_name || 'Chưa có bản chụp tên phòng' %> · Phiên bản đơn <%= payment.receipt_snapshot.revision_version %></p>
+  <% }else{ %><p>Phiếu cũ chưa lưu bản chụp khách/phòng tại thời điểm ghi; chỉ hiển thị các trường sổ gốc.</p><% } %>
+  <p>Số tiền: <strong><%= money(Math.abs(Number(payment.amount))) %></strong> · Giá trị có dấu trong sổ: <%= money(payment.amount) %></p>
+  <p>Phương thức: <%= methods[payment.method] %> · Tham chiếu: <%= payment.reference || 'Tiền mặt, không có mã bên ngoài' %></p>
+  <% if(payment.reverses_payment_id){ %><p>Đảo phiếu gốc <a href="/receipts/<%= payment.reverses_payment_id %>">#<%= payment.reverses_payment_id %></a>. Đây là bút toán sửa sổ, không tự thực hiện chuyển tiền.</p><% } %>
+  <% if(approval){ %><p>Yêu cầu #<%= approval.id %> · Người lập: <%= approval.requester_name %></p><p>Lý do: <%= approval.payload.reason %></p><p>Người duyệt: <%= approval.approver_name || 'Chưa duyệt' %> · <%= approval.decision_reason || '' %></p><% } %>
+  <p>Mã phiếu không đổi khi tải lại. Phiếu ghi nhận nghiệp vụ nội bộ; giao dịch bên ngân hàng/ví do nhân viên kiểm tra riêng.</p>
+  <button id="printReceipt" type="button" class="btn btn-gold">In phiếu</button> <a class="btn btn-outline" href="/finance">Về đối soát</a>
+</article></section></main>
+<%- include('../partials/footer') %>

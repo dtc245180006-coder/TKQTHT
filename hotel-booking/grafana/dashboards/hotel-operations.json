@@ -1,0 +1,17 @@
+{
+  "uid": "hotel-operations",
+  "title": "Hotel - Vận hành",
+  "schemaVersion": 39,
+  "version": 1,
+  "tags": ["hotel", "operations"],
+  "refresh": "15s",
+  "time": {"from": "now-1h", "to": "now"},
+  "panels": [
+    {"id": 1, "type": "stat", "title": "Khả năng phục vụ từng dịch vụ (1 = tốt)", "gridPos": {"x": 0, "y": 0, "w": 24, "h": 5}, "datasource": {"type": "prometheus", "uid": "prometheus"}, "targets": [{"expr": "hotel_probe_success", "legendFormat": "{{service}}", "refId": "A"}], "fieldConfig": {"defaults": {"min": 0, "max": 1, "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}, "overrides": []}},
+    {"id": 2, "type": "timeseries", "title": "Tỷ lệ đĩa còn trống", "gridPos": {"x": 0, "y": 5, "w": 12, "h": 7}, "datasource": {"type": "prometheus", "uid": "prometheus"}, "targets": [{"expr": "hotel_disk_free_ratio", "legendFormat": "{{filesystem}}", "refId": "A"}], "fieldConfig": {"defaults": {"unit": "percentunit", "min": 0, "max": 1}, "overrides": []}},
+    {"id": 3, "type": "stat", "title": "Tuổi bản sao thành công gần nhất", "gridPos": {"x": 12, "y": 5, "w": 6, "h": 7}, "datasource": {"type": "prometheus", "uid": "prometheus"}, "targets": [{"expr": "time() - hotel_backup_last_success_timestamp_seconds", "refId": "A"}], "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []}},
+    {"id": 4, "type": "stat", "title": "Sao lưu gần nhất (1 = thành công)", "gridPos": {"x": 18, "y": 5, "w": 6, "h": 7}, "datasource": {"type": "prometheus", "uid": "prometheus"}, "targets": [{"expr": "hotel_backup_last_attempt_success", "refId": "A"}]},
+    {"id": 5, "type": "table", "title": "Cảnh báo đang firing", "gridPos": {"x": 0, "y": 12, "w": 24, "h": 7}, "datasource": {"type": "prometheus", "uid": "prometheus"}, "targets": [{"expr": "ALERTS{alertstate=\"firing\"}", "format": "table", "instant": true, "refId": "A"}]},
+    {"id": 6, "type": "logs", "title": "Log ứng dụng đã lọc thông tin nhạy cảm", "gridPos": {"x": 0, "y": 19, "w": 24, "h": 9}, "datasource": {"type": "loki", "uid": "loki"}, "targets": [{"expr": "{job=\"hotel-backend\"}", "refId": "A"}]}
+  ]
+}

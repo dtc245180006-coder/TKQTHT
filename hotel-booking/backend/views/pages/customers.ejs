@@ -1,0 +1,36 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main-content">
+  <section id="customers-section" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="section-tag">HỒ SƠ KHÁCH HÀNG</span>
+          <h2 class="section-title">Thông tin khách hàng</h2>
+          <p class="muted">Đặt phòng giữ nguyên hồ sơ có sẵn. Thông tin người đặt được lưu riêng trên từng đơn.</p>
+        </div>
+        <button id="addCustomer" class="btn btn-gold">+ Thêm khách hàng</button>
+      </div>
+      <div class="toolbar">
+        <input id="customerSearch" type="search" placeholder="Tìm tên, email, số điện thoại" aria-label="Tìm khách hàng">
+      </div>
+      <div class="table-card table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Khách hàng</th>
+              <th>Liên hệ</th>
+              <th>Số đơn</th>
+              <th>Đã thu sau hoàn tiền</th>
+              <th>Ghi chú</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="customerBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('../components/editor-dialog') %>
+<%- include('../partials/footer') %>

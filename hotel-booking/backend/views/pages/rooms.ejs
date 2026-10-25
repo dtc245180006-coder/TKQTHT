@@ -1,0 +1,79 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main-content">
+<!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <span class="hero-subtitle">KỲ NGHỈ DƯỠNG TRONG MƠ TẠI VIỆT NAM</span>
+      <h1 class="hero-title">Khám phá kỳ nghỉ<br>trọn vẹn cùng bạn</h1>
+      <p class="hero-desc">
+        Hệ thống phòng nghỉ tiện nghi 5 sao, ẩm thực thượng hạng và dịch vụ quản gia cao cấp sẵn sàng phục vụ quý khách.
+      </p>
+
+      <!-- Filter / Search Box -->
+      <div class="search-card">
+        <div class="search-grid">
+          <div class="search-field">
+            <label for="filterType">Loại phòng</label>
+            <select id="filterType">
+              <option value="">Tất cả hạng phòng</option>
+              <option value="Deluxe">Deluxe</option>
+              <option value="Suite">Suite</option>
+              <option value="Villa">Villa Hướng Biển</option>
+              <option value="Penthouse">Penthouse</option>
+              <option value="Family">Family Suite</option>
+              <option value="Standard">Standard</option>
+            </select>
+          </div>
+          <div class="search-field">
+            <label for="checkInInput">Ngày nhận phòng</label>
+            <input type="date" id="checkInInput">
+          </div>
+          <div class="search-field">
+            <label for="checkOutInput">Ngày trả phòng</label>
+            <input type="date" id="checkOutInput">
+          </div>
+          <div class="search-field"><label for="guestsInput">Số khách</label><input type="number" id="guestsInput" min="1" max="50" value="1"></div>
+          <div class="search-action">
+            <button id="btnFilterRooms" class="btn btn-gold btn-block">
+              🔍 Tìm phòng
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content: Rooms Section -->
+  <section id="rooms-section" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="section-tag">DANH SÁCH PHÒNG</span>
+          <h2 class="section-title">Không Gian Nghỉ Dưỡng Hoàn Hảo</h2>
+        </div>
+        <div class="category-pills" id="categoryPills">
+          <button class="pill active" data-type="">Tất cả</button>
+          <button class="pill" data-type="Deluxe">Deluxe</button>
+          <button class="pill" data-type="Suite">Suite</button>
+          <button class="pill" data-type="Villa">Villa</button>
+          <button class="pill" data-type="Family">Gia đình</button>
+          <button class="pill" data-type="Standard">Standard</button>
+        </div>
+      </div>
+
+      <div class="toolbar"><p id="roomResults" class="muted" aria-live="polite"></p><select id="roomSort" aria-label="Sắp xếp phòng"><option value="default">Thứ tự mặc định</option><option value="priceAsc">Giá thấp đến cao</option><option value="priceDesc">Giá cao đến thấp</option></select><button id="resetFilters" class="btn btn-outline btn-sm">Xóa bộ lọc</button></div>
+      <p id="bookingRequestResult" role="status" hidden></p>
+      <!-- Rooms Grid -->
+      <div class="rooms-grid" id="roomsGrid">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Đang tải danh sách phòng từ máy chủ...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('../components/booking-dialog') %>
+<%- include('../partials/footer') %>

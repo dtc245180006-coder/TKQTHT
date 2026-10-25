@@ -1,0 +1,32 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main-content">
+  <section id="management-section" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="section-tag">DANH MỤC PHÒNG</span>
+          <h2 class="section-title">Quản lý phòng nghỉ</h2>
+        </div>
+        <button id="addRoom" class="btn btn-gold">+ Thêm phòng</button>
+      </div>
+      <div class="table-card table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Phòng</th>
+              <th>Hạng phòng</th>
+              <th>Giá / đêm</th>
+              <th>Sức chứa</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="roomAdminBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('../components/editor-dialog') %>
+<%- include('../partials/footer') %>
