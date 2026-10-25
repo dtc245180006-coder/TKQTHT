@@ -145,7 +145,7 @@ services:
       PGADMIN_LISTEN_PORT: 8080
       PGADMIN_CONFIG_SERVER_MODE: "True"
     ports:
-      - "127.0.0.1:5050:8080"
+      - "5050:8080"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
@@ -219,7 +219,7 @@ services:
       - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
       - prometheus_data:/prometheus
     ports:
-      - "127.0.0.1:9090:9090"
+      - "9090:9090"
     depends_on:
       - backend
       - postgres-exporter
@@ -297,7 +297,7 @@ services:
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager_data:/alertmanager
-    ports: ["127.0.0.1:9093:9093"]
+    ports: ["9093:9093"]
     networks: [monitoring, admin]
     restart: unless-stopped
     read_only: true
@@ -314,7 +314,7 @@ services:
     volumes:
       - operations_data:/var/lib/hotel-ops
       - ./output/operations:/observations:ro
-    ports: ["127.0.0.1:9094:9094"]
+    ports: ["9094:9094"]
     networks: [monitoring, edge, admin]
     restart: unless-stopped
     read_only: true

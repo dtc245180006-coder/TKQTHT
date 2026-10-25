@@ -1,15 +1,15 @@
 :root {
-  --primary: #183e33;
-  --primary-light: #285547;
-  --gold: #a86b32;
-  --gold-hover: #8b5423;
-  --gold-light: #f8eedf;
+  --primary: #203858;
+  --primary-light: #324e78;
+  --gold: #a55428;
+  --gold-hover: #843e1c;
+  --gold-light: #fff0e5;
   --accent: #2563eb;
-  --bg-light: #faf8f3;
+  --bg-light: #f4f7fc;
   --card-bg: #ffffff;
-  --border: #e3e5dc;
-  --text-dark: #203c33;
-  --text-muted: #68746e;
+  --border: #dce3ee;
+  --text-dark: #24354c;
+  --text-muted: #64748b;
   --success: #10b981;
   --danger: #ef4444;
   --radius-sm: 8px;
@@ -20,7 +20,7 @@
     0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg:
     0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  --shadow-gold: 0 10px 15px -3px rgba(217, 119, 6, 0.25);
+  --shadow-gold: 0 10px 15px -3px rgba(165, 84, 40, 0.22);
 }
 
 * {
@@ -90,7 +90,7 @@ button:disabled {
 
 button:focus-visible,
 a:focus-visible {
-  outline: 3px solid #bf8e55;
+  outline: 3px solid #a55428;
   outline-offset: 3px;
 }
 

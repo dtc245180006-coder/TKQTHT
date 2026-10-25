@@ -73,7 +73,7 @@ export function bookingRow(b) {
     <td>${esc(b.customer_name)}</td>
     <td>${esc(b.customer_phone)}<br><small>${esc(b.customer_email)}</small></td>
     <td><strong>${esc(b.room_name || `Chưa lưu tên phòng (#${b.room_id ?? "không còn mã"})`)}</strong><br><small>${esc(b.room_type || "Chưa lưu hạng phòng")}</small> · <small>${b.guest_count} khách</small>${!b.history_complete ? "<br><small>Đơn cũ thiếu thông tin phòng/đơn giá lịch sử</small>" : ""}</td>
-    <td class="nowrap">${day(b.check_in_date)}<br>→ ${day(b.check_out_date)}
+    <td class="nowrap">${day(b.check_in_date)}<br>Đến ${day(b.check_out_date)}
       ${b.checked_in_at ? `<br><small>Nhận: ${time(b.checked_in_at)}</small>` : ""}
       ${b.checked_out_at ? `<br><small>Trả: ${time(b.checked_out_at)}</small>` : ""}
     </td>
