@@ -1,7 +1,7 @@
 name: hotel-booking
 
 x-bounded-logs: &bounded_logs
-  driver: local
+  driver: json-file
   options:
     max-size: "10m"
     max-file: "3"
@@ -117,7 +117,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "127.0.0.1:80:8080"
+      - "8000:8080"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
@@ -247,6 +247,27 @@ services:
     security_opt:
       - no-new-privileges:true
 
+  promtail:
+    logging: *bounded_logs
+    mem_limit: 256m
+    cpus: "0.5"
+    pids_limit: 256
+    profiles: [linux-host-logs]
+    image: grafana/promtail:3.5.0
+    command: [-config.file=/etc/promtail/promtail-config.yml]
+    user: "0:0"
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - promtail_positions:/var/lib/promtail
+    networks: [monitoring]
+    depends_on: [loki]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [DAC_READ_SEARCH]
+    security_opt: [no-new-privileges:true]
+
   alloy:
     user: "473:1000"
     logging: *bounded_logs
@@ -318,7 +339,7 @@ services:
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
       GF_USERS_ALLOW_SIGN_UP: "false"
     ports:
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
@@ -348,7 +369,6 @@ volumes:
   grafana_data:
   loki_data:
   promtail_positions:
-    # Retained legacy data only; no Promtail service is started.
   backend_logs:
   alloy_data:
   alertmanager_data:

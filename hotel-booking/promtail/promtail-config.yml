@@ -10,16 +10,17 @@ clients:
 
 scrape_configs:
   - job_name: docker
-    docker_sd_configs:
-      - host: unix:///var/run/docker.sock
-        refresh_interval: 5s
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: docker
+          __path__: /var/lib/docker/containers/*/*-json.log
     relabel_configs:
-      - source_labels: [__meta_docker_container_name]
-        regex: /(.+)
-        target_label: container
-      - source_labels: [__meta_docker_container_label_com_docker_compose_project]
-        target_label: compose_project
-      - source_labels: [__meta_docker_container_label_com_docker_compose_service]
-        target_label: service
+      - source_labels: [__path__]
+        regex: .*/([a-f0-9]{64})/.*-json.log
+        target_label: container_id
     pipeline_stages:
       - docker: {}
+      - drop:
+          older_than: 168h
+          drop_counter_reason: outside_loki_retention
